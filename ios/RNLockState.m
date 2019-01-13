@@ -22,18 +22,37 @@ RCT_EXPORT_MODULE()
 
 - (void)startObserving
 {
-    notify_register_dispatch("com.apple.springboard.lockstate", &notify_token_lockstate, dispatch_get_main_queue(), ^(int token) {
-        uint64_t state = UINT64_MAX;
-        notify_get_state(token, &state);
-        [self handleLockStateChange:state];
-    });
-
-    notify_register_dispatch("com.apple.springboard.lockcomplete", &notify_token_lockcomplete, dispatch_get_main_queue(), ^(int token) {
-        uint64_t state = UINT64_MAX;
-        notify_get_state(token, &state);
-        [self handleLockComplete:state];
-    });
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveTestNotification:)
+                                                 name:@"TestNotification"
+                                               object:nil];
+    
+//    notify_register_dispatch("com.apple.springboard.lockstate", &notify_token_lockstate, dispatch_get_main_queue(), ^(int token) {
+//        uint64_t state = UINT64_MAX;
+//        notify_get_state(token, &state);
+//        [self handleLockStateChange:state];
+//    });
+//
+//    notify_register_dispatch("com.apple.springboard.lockcomplete", &notify_token_lockcomplete, dispatch_get_main_queue(), ^(int token) {
+//        uint64_t state = UINT64_MAX;
+//        notify_get_state(token, &state);
+//        [self handleLockComplete:state];
+//    });
 }
+
+- (void) receiveTestNotification:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"TestNotification"])
+        NSLog (@"Successfully received the test notification!");
+        printf("asdf");
+    [self sendEventWithName:@"lockStateDidChange" body:@{@"lockState": @"unlocked"}];
+}
+
 
 - (void)stopObserving
 {
