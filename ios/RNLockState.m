@@ -15,6 +15,22 @@
 
 RCT_EXPORT_MODULE()
 
+////Include the following in AppDelegate.m
+
+//-(void)applicationProtectedDataWillBecomeUnavailable:(UIApplication *)application
+//{
+//    [[NSNotificationCenter defaultCenter]
+//     postNotificationName:@"DataWillBecomeUnavailable"
+//     object:self];
+//}
+//
+//- (void)applicationProtectedDataDidBecomeAvailable:(UIApplication *)application
+//{
+//    [[NSNotificationCenter defaultCenter]
+//     postNotificationName:@"DataDidBecomeAvailable"
+//     object:self];
+//}
+
 - (NSArray<NSString *> *)supportedEvents
 {
     return @[@"lockStateDidChange", @"lockComplete"];
@@ -24,33 +40,29 @@ RCT_EXPORT_MODULE()
 {
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(receiveTestNotification:)
-                                                 name:@"TestNotification"
-                                               object:nil];
-    
-//    notify_register_dispatch("com.apple.springboard.lockstate", &notify_token_lockstate, dispatch_get_main_queue(), ^(int token) {
-//        uint64_t state = UINT64_MAX;
-//        notify_get_state(token, &state);
-//        [self handleLockStateChange:state];
-//    });
-//
-//    notify_register_dispatch("com.apple.springboard.lockcomplete", &notify_token_lockcomplete, dispatch_get_main_queue(), ^(int token) {
-//        uint64_t state = UINT64_MAX;
-//        notify_get_state(token, &state);
-//        [self handleLockComplete:state];
-//    });
+        selector:@selector(receiveNotification:)
+        name:@"DataDidBecomeAvailable"
+        object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(receiveNotification:)
+        name:@"DataWillBecomeUnavailable"
+        object:nil];
+
 }
 
-- (void) receiveTestNotification:(NSNotification *) notification
+- (void) receiveNotification:(NSNotification *) notification
 {
-    // [notification name] should always be @"TestNotification"
-    // unless you use this method for observation of other notifications
-    // as well.
-    
-    if ([[notification name] isEqualToString:@"TestNotification"])
-        NSLog (@"Successfully received the test notification!");
-        printf("asdf");
+   
+    if ([[notification name] isEqualToString:@"DataDidBecomeAvailable"])
+        
+//        printf("Data Became Available");
     [self sendEventWithName:@"lockStateDidChange" body:@{@"lockState": @"unlocked"}];
+    
+    if ([[notification name] isEqualToString:@"DataWillBecomeUnavailable"])
+//        printf("Data Will become unavailable");
+    [self sendEventWithName:@"lockStateDidChange" body:@{@"lockState": @"locked"}];
+    
+
 }
 
 
@@ -59,19 +71,6 @@ RCT_EXPORT_MODULE()
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)handleLockStateChange:(uint64_t)state
-{
-    if (state == 0) {
-        [self sendEventWithName:@"lockStateDidChange" body:@{@"lockState": @"unlocked"}];
-    } else {
-        [self sendEventWithName:@"lockStateDidChange" body:@{@"lockState": @"locked"}];
-    }
-}
-
-- (void)handleLockComplete:(uint64_t)state
-{
-    [self sendEventWithName:@"lockComplete" body:@{@"lockState": @"lockComplete"}];
-}
 
 @end
   

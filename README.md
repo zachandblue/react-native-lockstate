@@ -38,6 +38,26 @@ Compliant with Apple Guidelines
 
 
 ## Usage
+
+iOS 
+
+In AppDelegate.m include the following code:
+
+-(void)applicationProtectedDataWillBecomeUnavailable:(UIApplication *)application
+{
+   [[NSNotificationCenter defaultCenter]
+    postNotificationName:@"DataWillBecomeUnavailable"
+    object:self];
+}
+
+- (void)applicationProtectedDataDidBecomeAvailable:(UIApplication *)application
+{
+   [[NSNotificationCenter defaultCenter]
+    postNotificationName:@"DataDidBecomeAvailable"
+    object:self];
+}
+
+
 ```javascript
 import RNLockState from 'react-native-lockstate';
 
@@ -46,7 +66,7 @@ RNLockState.addEventListener('change', (lockStateData) => {
   console.log(lockStateData);
 });
 
-// only lockComplete
+// only lockComplete (obsolete)
 RNLockState.addEventListener('lockComplete', (lockStateData) => {
   console.log(lockStateData);
 });
