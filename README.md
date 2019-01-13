@@ -1,6 +1,8 @@
 
 # react-native-lockstate
 
+Compliant with Apple Guidelines
+
 ## Getting started
 
 `$ npm install react-native-lockstate --save`
