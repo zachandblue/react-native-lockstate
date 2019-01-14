@@ -30,13 +30,35 @@ public class RNLockStateModule extends ReactContextBaseJavaModule implements Lif
 
   @Override
   public void onHostPause() {
-    KeyguardManager myKM = (KeyguardManager) mReactContext.getSystemService(Context.KEYGUARD_SERVICE);
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          this.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
 
-    if(myKM.inKeyguardRestrictedInputMode()) {
-      getReactApplicationContext()
-        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-        .emit("locked", null);
-    }
+
+        // your code here
+
+        KeyguardManager myKM = (KeyguardManager) mReactContext.getSystemService(Context.KEYGUARD_SERVICE);
+//    boolean isKeyguardUp = myKM.inKeyguardRestrictedInputMode();
+
+        if(myKM.isKeyguardLocked()) {
+          System.out.println('l');
+          getReactApplicationContext()
+                  .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                  .emit("locked", null);
+        } else {
+          System.out.println('u');
+          getReactApplicationContext()
+                  .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                  .emit("unlocked", null);
+        }
+
+      }
+    }.start();
   }
 
   @Override
